@@ -1,0 +1,9 @@
+# Configuration for immun_analysis #
+# 1 make sure docker is running
+# 2 cd to folder with Dockerfile using cmd or terminal
+# 3 docker build -t immunanalysis . <- When using first time
+# 4 insert files into input, both DAPI and CD64 into the same folder
+# 5 docker run -v "path/to/immun_analysis/:/home/user/immun_analysis/" immunanalysis <- Start mapping
+# Step 5 can be done from docker desktop in the future -> just start the container again
+
+# example: docker run -v "C:/Users/Devon/VSProjects/immun_analysis/:/home/user/immune_analysis/" immunanalysis

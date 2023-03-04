@@ -1,0 +1,36 @@
+############   config   ############
+TYPE = (".tif", ".tiff")
+SNAKEDIR = "/home/user/immune_analysis/Snakemake/"
+PATH = f"{SNAKEDIR}../"
+ENDCD64 = "_CD64_raw.tif"
+ENDDAPI = "_DAPI_raw_cp_masks.tif"
+images = [
+    image[:11]
+    for image in os.listdir(PATH + "input")
+    if image.endswith(TYPE) and image.split(".")[0][-3:] == "raw"
+]
+
+
+############   rules   ############
+include: "rules/otsu.smk"
+include: "rules/registration.smk"
+include: "rules/ml.smk"
+include: "rules/skeletonization.smk"
+include: "rules/statistic.smk"
+
+
+############   input assembler   ############
+def get_input(images, input_list=[]):
+    input_list.append(
+        expand(PATH + "result/" + "otsu-{images}" + ENDCD64, images=images)
+    )
+    input_list.append(
+        expand(PATH + "result/" + "otsu-reg-{images}" + ENDCD64, images=images)
+    )
+    return input_list
+
+
+############   target rule   ############
+rule summary:
+    input:
+        get_input(images),

@@ -1,0 +1,17 @@
+name: env
+channels:
+  - bioconda
+  - conda-forge
+  - cf-staging/noarch
+  - cf-staging/linux-64
+  - bioconda/noarch
+  - bioconda/linux-64
+  - conda-forge/linux-64
+dependencies:
+  - python=3.9.10
+  - numpy=1.21.2
+  - pip
+  - aicsimageio=4.9.4
+  - opencv=4.7.0
+  - snakemake=7.24.0
+  - scikit-image=0.19.3
