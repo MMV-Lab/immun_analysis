@@ -1,0 +1,14 @@
+otsu:
+  contrast:
+    percentile:
+      - 0.1
+      - 99.9
+  tophat:
+    size:
+      - 50
+      - 50
+  threshold:
+    factor: 2.1
+  small_objects:
+    min_size: 30
+    connectivity: 2

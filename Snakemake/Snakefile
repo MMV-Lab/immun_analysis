@@ -4,6 +4,7 @@ SNAKEDIR = "/home/user/immune_analysis/Snakemake/"
 PATH = f"{SNAKEDIR}../"
 ENDCD64 = "_CD64_raw.tif"
 ENDDAPI = "_DAPI_raw_cp_masks.tif"
+CONFIG = "config.yaml"
 images = [
     image[:11]
     for image in os.listdir(PATH + "input")

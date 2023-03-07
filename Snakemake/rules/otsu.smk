@@ -4,4 +4,4 @@ rule otsu:
     output:
         PATH + "result/" + "otsu-{images}" + ENDCD64,
     shell:
-        "python Snakemake/scripts/otsu_segmentation.py --input {input} --output {output}"
+        "python Snakemake/scripts/otsu_segmentation.py {input} {output} -c {CONFIG}"
