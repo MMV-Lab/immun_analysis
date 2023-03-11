@@ -55,17 +55,21 @@ if __name__ == "__main__":
     image = get_image(args.input)
 
     image_contrast = contrast_stretching(
-        image, config["otsu"]["contrast"]["percentile"]
+        image, config["otsu_segmentation"]["contrast"]["percentile"]
     )
 
-    image_tophat = tophat_filter(image_contrast, config["otsu"]["tophat"]["size"])
+    image_tophat = tophat_filter(
+        image_contrast, config["otsu_segmentation"]["tophat"]["element_size"]
+    )
 
-    image_otsu = otsu_threshold(image_tophat, config["otsu"]["threshold"]["factor"])
+    image_otsu = otsu_threshold(
+        image_tophat, config["otsu_segmentation"]["otsu_threshold"]["factor"]
+    )
 
     image_otsu_smallobject = remove_small_objects(
         image_otsu,
-        config["otsu"]["small_objects"]["min_size"],
-        config["otsu"]["small_objects"]["connectivity"],
+        config["otsu_segmentation"]["small_objects"]["min_size"],
+        config["otsu_segmentation"]["small_objects"]["connectivity"],
     )
 
     io.imsave(

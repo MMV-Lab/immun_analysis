@@ -1,7 +1,7 @@
 rule otsu:
     input:
-        PATH + "input/" + "{images}" + ENDCD64,
+        join(INPUT, "{image}" + TARGET + TYPE),
     output:
-        PATH + "result/" + "otsu-{images}" + ENDCD64,
+        join(OUTPUT, STEP1, "{image}" + TYPE),
     shell:
         "python Snakemake/scripts/otsu_segmentation.py {input} {output} -c {CONFIG}"

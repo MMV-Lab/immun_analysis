@@ -1,15 +1,25 @@
 ############   config   ############
-TYPE = (".tif", ".tiff")
-SNAKEDIR = "/home/user/immune_analysis/Snakemake/"
-PATH = f"{SNAKEDIR}../"
-ENDCD64 = "_CD64_raw.tif"
-ENDDAPI = "_DAPI_raw_cp_masks.tif"
+from os.path import join
+TYPE = ".tif"
+PATH = "/home/user/immune_analysis"
 CONFIG = "config.yaml"
-images = [
-    image[:11]
-    for image in os.listdir(PATH + "input")
-    if image.endswith(TYPE) and image.split(".")[0][-3:] == "raw"
-]
+configfile: join(PATH, CONFIG)
+INPUT = join(PATH, "input")
+OUTPUT = join(PATH, "result")
+
+STEP1 = "otsu_segmented"
+STEP2 = "otsu_registrated"
+STEP3 = "ml_segmented"
+STEP4 = "ml_registrated"
+
+TARGET = "_" + config["target"]
+REGISTRATION = "_" + config["registration"]
+
+image = list(set(
+    "_".join(image.split("_")[:-1])
+    for image in os.listdir(INPUT)
+    if image.endswith(TYPE)
+))
 
 
 ############   rules   ############
@@ -21,12 +31,12 @@ include: "rules/statistic.smk"
 
 
 ############   input assembler   ############
-def get_input(images, input_list=[]):
+def get_input(image, input_list=[]):
     input_list.append(
-        expand(PATH + "result/" + "otsu-{images}" + ENDCD64, images=images)
+        expand(join(OUTPUT, STEP1, "{image}" + TYPE), image=image)
     )
     input_list.append(
-        expand(PATH + "result/" + "otsu-reg-{images}" + ENDCD64, images=images)
+        expand(join(OUTPUT, STEP2, "{image}" + TYPE), image=image)
     )
     return input_list
 
@@ -34,4 +44,4 @@ def get_input(images, input_list=[]):
 ############   target rule   ############
 rule summary:
     input:
-        get_input(images),
+        get_input(image),
