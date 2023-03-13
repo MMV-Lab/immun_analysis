@@ -1,25 +1,38 @@
 ############   config   ############
 from os.path import join
-TYPE = ".tif"
-PATH = "/home/user/immune_analysis"
-CONFIG = "config.yaml"
-configfile: join(PATH, CONFIG)
+
+PATH = "/home/user/immun_analysis"
 INPUT = join(PATH, "input")
 OUTPUT = join(PATH, "result")
+CONFIG = "config.yaml"
 
 STEP1 = "otsu_segmented"
 STEP2 = "otsu_registrated"
 STEP3 = "ml_segmented"
 STEP4 = "ml_registrated"
 
+
+configfile: join(PATH, CONFIG)
+
+
 TARGET = "_" + config["target"]
 REGISTRATION = "_" + config["registration"]
+types = set(file.split(".")[-1] for file in os.listdir(INPUT))
+if "tif" in types and "tiff" in types:
+    print("Both .tif and .tiff files detected. Please use only one format")
+    TYPE = ""
+elif "tif" in types:
+    TYPE = ".tif"
+else:
+    TYPE = ".tiff"
 
-image = list(set(
-    "_".join(image.split("_")[:-1])
-    for image in os.listdir(INPUT)
-    if image.endswith(TYPE)
-))
+image = list(
+    set(
+        "_".join(image.split("_")[:-1])
+        for image in os.listdir(INPUT)
+        if image.endswith(TYPE)
+    )
+)
 
 
 ############   rules   ############
@@ -30,14 +43,10 @@ include: "rules/skeletonization.smk"
 include: "rules/statistic.smk"
 
 
-############   input assembler   ############
+############   inputs   ############
 def get_input(image, input_list=[]):
-    input_list.append(
-        expand(join(OUTPUT, STEP1, "{image}" + TYPE), image=image)
-    )
-    input_list.append(
-        expand(join(OUTPUT, STEP2, "{image}" + TYPE), image=image)
-    )
+    input_list.append(expand(join(OUTPUT, STEP1, "{image}" + TYPE), image=image))
+    input_list.append(expand(join(OUTPUT, STEP2, "{image}" + TYPE), image=image))
     return input_list
 
 

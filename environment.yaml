@@ -2,15 +2,10 @@ name: env
 channels:
   - bioconda
   - conda-forge
-  - cf-staging/noarch
-  - cf-staging/linux-64
-  - bioconda/noarch
-  - bioconda/linux-64
-  - conda-forge/linux-64
+  - cf-staging
 dependencies:
   - aicsimageio=4.9.4
   - numpy=1.21.2
-  - opencv=4.7.0
   - pip
   - python=3.9.10
   - pyyaml=6.0

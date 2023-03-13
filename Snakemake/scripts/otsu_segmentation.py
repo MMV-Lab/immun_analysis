@@ -1,38 +1,8 @@
 import argparse
 import yaml
 import numpy as np
-from skimage import filters, io, morphology, img_as_float32
-from aicsimageio import AICSImage
-from cv2 import getStructuringElement, MORPH_ELLIPSE, morphologyEx, MORPH_TOPHAT
-
-############   Functions   ############
-def get_image(dir):
-    return AICSImage(dir).get_image_data("YX")
-
-
-def contrast_stretching(image, percentile):
-    upper_v = np.percentile(image, percentile[1])
-    lower_v = np.percentile(image, percentile[0])
-
-    image[image > upper_v] = upper_v
-    image[image < lower_v] = lower_v
-    return (image - lower_v) / (upper_v - lower_v)
-
-
-def tophat_filter(image, size):
-    kernel50 = getStructuringElement(MORPH_ELLIPSE, (size[0], size[1]))
-    return morphologyEx(image, MORPH_TOPHAT, kernel50)
-
-
-def otsu_threshold(image, factor):
-    Threshold = filters.threshold_otsu(image)
-    return image > Threshold * factor
-
-
-def remove_small_objects(image, min_size, connectivity):
-    return morphology.remove_small_objects(
-        image, min_size=min_size, connectivity=connectivity
-    )
+from utils import contrast_stretching, get_image, remove_so, otsu_threshold, tophat_filter
+from aicsimageio.writers import OmeTiffWriter
 
 
 ############   Main   ############
@@ -66,16 +36,12 @@ if __name__ == "__main__":
         image_tophat, config["otsu_segmentation"]["otsu_threshold"]["factor"]
     )
 
-    image_otsu_smallobject = remove_small_objects(
+    image_otsu_smallobject = remove_so(
         image_otsu,
         config["otsu_segmentation"]["small_objects"]["min_size"],
         config["otsu_segmentation"]["small_objects"]["connectivity"],
     )
+    
+    image_processed = image_otsu_smallobject.astype(np.uint8)
 
-    io.imsave(
-        args.output,
-        img_as_float32(image_otsu_smallobject),
-        plugin="pil",
-        optimize=True,
-        bits=1,
-    )
+    OmeTiffWriter.save(image_processed, args.output, dim_order="YX")

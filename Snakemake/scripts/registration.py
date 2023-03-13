@@ -1,15 +1,8 @@
-from skimage import measure, io, img_as_bool
-from aicsimageio import AICSImage
+from skimage import measure
+import numpy as np
+from utils import get_binary_img, get_image
 import argparse
-
-
-############   Functions   ############
-def get_image(dir):
-    return AICSImage(dir).get_image_data("YX")
-
-
-def get_binary_img(image):
-    return img_as_bool(image / 255)
+from aicsimageio.writers import OmeTiffWriter
 
 
 ############   Main   ############
@@ -24,7 +17,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--output", type=str, help="Path to store the registered images"
     )
-
+    # Will be swapped out for new script
     args = parser.parse_args()
     for arg in vars(args):
         print(arg, "|>", getattr(args, arg))
@@ -47,10 +40,6 @@ if __name__ == "__main__":
             for coords in obj:
                 otsu[coords[0], coords[1]] = 0
 
-    io.imsave(
-        args.output,
-        img_as_bool(otsu),
-        plugin="pil",
-        optimize=True,
-        bits=1,
-    )
+    image_processed = otsu.astype(np.uint8)
+
+    OmeTiffWriter.save(image_processed, args.output, dim_order="YX")

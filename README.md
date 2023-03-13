@@ -8,7 +8,7 @@ Follow these instructions to perform the analysis:
 3. Build the Docker image by calling ```docker build -t immunanalysis .``` from the immun_analysis directory.
 4. Insert the CD64 und DAPI images into the input folder.
 5. Adjust parameters in the config.yaml file.
-6. Run the analysis by calling `docker run -v "path/to/immun_analysis:/home/user/immune_analysis/" immunanalysis`
+6. Run the analysis by calling `docker run -v "path/to/immun_analysis:/home/user/immun_analysis/" immunanalysis`
 
 ## Local Version (without Docker)
 Follow these instructions to perform the analysis without docker:

@@ -28,10 +28,8 @@ COPY --from=mamba /env /env
 
 ENV PATH /env/bin:$PATH
 
-RUN apt-get update && apt-get install libgl1 -y
+COPY . /home/user/immun_analysis/
 
-COPY . /home/user/immune_analysis/
-
-WORKDIR /home/user/immune_analysis/
+WORKDIR /home/user/immun_analysis/
 
 CMD [ "snakemake", "-c", "all", "-k" ,"--snakefile", "./Snakemake/Snakefile" ]
