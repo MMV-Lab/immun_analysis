@@ -1,0 +1,17 @@
+target: CD64
+registration: DAPI
+
+otsu_segmentation:
+  contrast:
+    percentile:
+      - 0.1
+      - 99.9
+  tophat:
+    element_size:
+      - 50
+      - 50
+  otsu_threshold:
+    factor: 2.1
+  small_objects:
+    min_size: 30
+    connectivity: 2
