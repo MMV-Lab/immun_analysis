@@ -23,5 +23,5 @@ filenames = sorted(input_dir.glob("*DAPI.tif"))
 for fn in filenames:
     image = io.imread(fn)
     masks, _, _ = model.eval([image], channels=[chan, chan2], diameter=diameter)
-    out_path = savedir / fn.name
+    out_path = savedir / fn.name.replace('_DAPI.tif',".tif" ,-1)
     OmeTiffWriter.save(masks[0], out_path, dim_order="YX") 
