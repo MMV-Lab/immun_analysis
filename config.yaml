@@ -15,3 +15,11 @@ otsu_segmentation:
   small_objects:
     min_size: 30
     connectivity: 2
+
+dapi_segmentation:
+  model_name: default # default or model name
+  model_diameter: default # default or float for the custom model
+  gpu: True
+
+colocalization:
+  distance_filter_threshold: 7

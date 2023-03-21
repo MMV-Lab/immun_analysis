@@ -1,7 +1,15 @@
 import argparse
 import yaml
 import numpy as np
-from utils import contrast_stretching, get_image, remove_so, otsu_threshold, tophat_filter
+from utils import (
+    contrast_stretching,
+    get_image_data,
+    get_reader,
+    remove_so,
+    otsu_threshold,
+    save_image,
+    tophat_filter,
+)
 from aicsimageio.writers import OmeTiffWriter
 
 
@@ -11,8 +19,8 @@ if __name__ == "__main__":
         description="Loads .tiff images and segments them with OTSU-Threshold"
     )
     # Positional Arguments
-    parser.add_argument("input", type=str, help="Path to the image")
-    parser.add_argument("output", type=str, help="Path to output & name")
+    parser.add_argument("--input", type=str, help="Path to the image")
+    parser.add_argument("--output", nargs="+", type=str, help="Path to output & name")
     # Required Arguments
     parser.add_argument("-c", type=str, help="Path to config.yaml")
     args = parser.parse_args()
@@ -22,7 +30,8 @@ if __name__ == "__main__":
     with open(args.c, "r") as file:
         config = yaml.safe_load(file)
 
-    image = get_image(args.input)
+    reader = get_reader(args.input)
+    image = get_image_data(reader, config["target"])
 
     image_contrast = contrast_stretching(
         image, config["otsu_segmentation"]["contrast"]["percentile"]
@@ -31,6 +40,8 @@ if __name__ == "__main__":
     image_tophat = tophat_filter(
         image_contrast, config["otsu_segmentation"]["tophat"]["element_size"]
     )
+
+    save_image(image_tophat, args.output[0])
 
     image_otsu = otsu_threshold(
         image_tophat, config["otsu_segmentation"]["otsu_threshold"]["factor"]
@@ -41,7 +52,5 @@ if __name__ == "__main__":
         config["otsu_segmentation"]["small_objects"]["min_size"],
         config["otsu_segmentation"]["small_objects"]["connectivity"],
     )
-    
-    image_processed = image_otsu_smallobject.astype(np.uint8)
 
-    OmeTiffWriter.save(image_processed, args.output, dim_order="YX")
+    save_image(image_otsu_smallobject, args.output[1], asuint=True)
