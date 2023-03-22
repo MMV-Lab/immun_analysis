@@ -4,17 +4,6 @@ from utils import binarize, get_reader, get_image_data, get_config, save_image
 from skimage.morphology import dilation, disk, label
 
 
-def unilabel_array(x, y):
-    x[x != y] = 0
-    x[x > 0] = 1
-    return x
-
-
-def get_dilation(x, disk_dilation):
-    x = dilation(x, disk_dilation)
-    return x
-
-
 ############   Main   ############
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -35,28 +24,46 @@ if __name__ == "__main__":
     config = get_config(args.c)
     print("start")
     otsu = binarize(get_image_data(get_reader(args.input[0])))
-    dapi = binarize(get_image_data(get_reader(args.input[1])))
+    reader = get_reader(args.input[1])
+    dapi = binarize(get_image_data(reader))
 
     lbdapi, numdapi = label(dapi, return_num=True)
     lbotsu, numotsu = label(otsu, return_num=True)
 
-    disk_dilation = disk(config["colocalization"]["distance_filter_threshold"])
-    
+    distance_filter_threshold = round(
+        config["colocalization"]["distance_filter_threshold"]
+        / (reader.physical_pixel_sizes.X)
+    )
+
+    disk_dilation = disk(distance_filter_threshold)
+
     dapi = dilation(dapi, disk_dilation)
 
-    save_image(dapi, args.output[0], asuint=True)
+    save_image(
+        dapi,
+        args.output[0],
+        reader.physical_pixel_sizes.Y,
+        reader.physical_pixel_sizes.X,
+        asuint=True,
+    )
 
     lb, num = label(otsu, return_num=True)
     print("Before: ", num)
 
     new_mask = np.zeros(otsu.shape)
     for j in range(1, num + 1):
-       if np.count_nonzero(dapi[lb == j]) > 0:
-           new_mask[lb == j] = 1.0
+        if np.count_nonzero(dapi[lb == j]) > 0:
+            new_mask[lb == j] = 1.0
 
     image_processed = new_mask.astype(np.uint8)
 
     lb, num = label(image_processed, return_num=True)
     print("After: ", num)
 
-    save_image(image_processed, args.output[1], asuint=True)
+    save_image(
+        image_processed,
+        args.output[1],
+        reader.physical_pixel_sizes.Y,
+        reader.physical_pixel_sizes.X,
+        asuint=True,
+    )

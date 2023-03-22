@@ -1,6 +1,5 @@
 import argparse
 import yaml
-import numpy as np
 from utils import (
     contrast_stretching,
     get_image_data,
@@ -10,7 +9,6 @@ from utils import (
     save_image,
     tophat_filter,
 )
-from aicsimageio.writers import OmeTiffWriter
 
 
 ############   Main   ############
@@ -41,16 +39,32 @@ if __name__ == "__main__":
         image_contrast, config["otsu_segmentation"]["tophat"]["element_size"]
     )
 
-    save_image(image_tophat, args.output[0])
+    save_image(
+        image_tophat,
+        args.output[0],
+        reader.physical_pixel_sizes.Y,
+        reader.physical_pixel_sizes.X,
+    )
 
     image_otsu = otsu_threshold(
         image_tophat, config["otsu_segmentation"]["otsu_threshold"]["factor"]
     )
 
+    min_size = round(
+        config["otsu_segmentation"]["small_objects"]["min_size"]
+        / (reader.physical_pixel_sizes.X**2)
+    )
+
     image_otsu_smallobject = remove_so(
         image_otsu,
-        config["otsu_segmentation"]["small_objects"]["min_size"],
+        min_size,
         config["otsu_segmentation"]["small_objects"]["connectivity"],
     )
 
-    save_image(image_otsu_smallobject, args.output[1], asuint=True)
+    save_image(
+        image_otsu_smallobject,
+        args.output[1],
+        reader.physical_pixel_sizes.Y,
+        reader.physical_pixel_sizes.X,
+        asuint=True,
+    )

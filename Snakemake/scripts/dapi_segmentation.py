@@ -46,4 +46,10 @@ if __name__ == "__main__":
 
     masks, _, _ = model.eval([image], channels=[CHAN, CHAN2], diameter=diameter)
 
-    save_image(masks[0], args.output, asuint=True)
+    save_image(
+        masks[0],
+        args.output,
+        reader.physical_pixel_sizes.Y,
+        reader.physical_pixel_sizes.X,
+        asuint=True,
+    )

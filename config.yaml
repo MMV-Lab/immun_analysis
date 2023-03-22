@@ -13,7 +13,7 @@ otsu_segmentation:
   otsu_threshold:
     factor: 2.1
   small_objects:
-    min_size: 30
+    min_size: 3.2 # μm²
     connectivity: 2
 
 dapi_segmentation:
@@ -22,4 +22,4 @@ dapi_segmentation:
   gpu: True
 
 colocalization:
-  distance_filter_threshold: 7
+  distance_filter_threshold: 2.25 # μm

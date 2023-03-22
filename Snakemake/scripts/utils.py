@@ -1,6 +1,7 @@
 import numpy as np
 from aicsimageio import AICSImage
 from aicsimageio.writers import OmeTiffWriter
+from aicsimageio.types import PhysicalPixelSizes
 from skimage.filters import threshold_otsu
 from yaml import safe_load
 from skimage.morphology import remove_small_objects, white_tophat
@@ -30,9 +31,11 @@ def get_config(path):
     return config
 
 
-def get_image_data(reader, channel = False):
+def get_image_data(reader, channel=False):
     if channel:
-        image = reader.get_image_data("YX", C=reader.channel_names.index(channel), T=0, Z=0)
+        image = reader.get_image_data(
+            "YX", C=reader.channel_names.index(channel), T=0, Z=0
+        )
     else:
         image = reader.get_image_data("YX", C=0, T=0, Z=0)
     return image
@@ -43,19 +46,24 @@ def get_reader(path):
 
 
 def otsu_threshold(image, factor):
-    Threshold = threshold_otsu(image)
-    return image > Threshold * factor
+    threshold = threshold_otsu(image)
+    return image > threshold * factor
 
 
 def remove_so(image, min_size, connectivity):
     return remove_small_objects(image, min_size=min_size, connectivity=connectivity)
 
 
-def save_image(image, path, asuint=False):
+def save_image(image, path, ysize, xsize, asuint=False):
     if asuint:
         image = image.astype(np.uint8)
         image[image > 0] = 255
-    OmeTiffWriter.save(image, path, dim_order="YX")
+    OmeTiffWriter.save(
+        image,
+        path,
+        dim_order="YX",
+        physical_pixel_sizes=[PhysicalPixelSizes(0, ysize, xsize)],
+    )
 
 
 def tophat_filter(image, size):
