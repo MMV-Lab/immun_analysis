@@ -1,8 +1,7 @@
-from skimage import measure
-import numpy as np
-from utils import get_binary_img, get_image
 import argparse
-from aicsimageio.writers import OmeTiffWriter
+import numpy as np
+from utils import binarize, get_reader, get_image_data, get_config, save_image
+from skimage.morphology import dilation, disk, label
 
 
 ############   Main   ############
@@ -15,31 +14,56 @@ if __name__ == "__main__":
         "--input", type=str, nargs="+", help="Paths to the otsu and dapi image"
     )
     parser.add_argument(
-        "--output", type=str, help="Path to store the registered images"
+        "--output", type=str, nargs="+", help="Path to store the registered images"
     )
-    # Will be swapped out for new script
+    parser.add_argument("-c", type=str, help="Path to config.yaml")
     args = parser.parse_args()
     for arg in vars(args):
         print(arg, "|>", getattr(args, arg))
 
-    otsu = get_binary_img(get_image(args.input[0]))
-    dapi = get_binary_img(get_image(args.input[1]))
+    config = get_config(args.c)
+    print("start")
+    otsu = binarize(get_image_data(get_reader(args.input[0])))
+    reader = get_reader(args.input[1])
+    dapi = binarize(get_image_data(reader))
 
-    x1_labels = measure.label(otsu, connectivity=2)
-    x1_regionprops = measure.regionprops(x1_labels)
+    lbdapi, numdapi = label(dapi, return_num=True)
+    lbotsu, numotsu = label(otsu, return_num=True)
 
-    object_coords = [obj["coords"] for obj in x1_regionprops]
+    distance_filter_threshold = round(
+        config["colocalization"]["distance_filter_threshold"]
+        / (reader.physical_pixel_sizes.X)
+    )
 
-    for obj in object_coords:
-        count = 0
-        for coords in obj:
-            if dapi[coords[0], coords[1]] == 1:
-                count = count + 1
-        percent = count / len(obj)
-        if percent == 0:
-            for coords in obj:
-                otsu[coords[0], coords[1]] = 0
+    disk_dilation = disk(distance_filter_threshold)
 
-    image_processed = otsu.astype(np.uint8)
+    dapi = dilation(dapi, disk_dilation)
 
-    OmeTiffWriter.save(image_processed, args.output, dim_order="YX")
+    save_image(
+        dapi,
+        args.output[0],
+        reader.physical_pixel_sizes.Y,
+        reader.physical_pixel_sizes.X,
+        asuint=True,
+    )
+
+    lb, num = label(otsu, return_num=True)
+    print("Before: ", num)
+
+    new_mask = np.zeros(otsu.shape)
+    for j in range(1, num + 1):
+        if np.count_nonzero(dapi[lb == j]) > 0:
+            new_mask[lb == j] = 1.0
+
+    image_processed = new_mask.astype(np.uint8)
+
+    lb, num = label(image_processed, return_num=True)
+    print("After: ", num)
+
+    save_image(
+        image_processed,
+        args.output[1],
+        reader.physical_pixel_sizes.Y,
+        reader.physical_pixel_sizes.X,
+        asuint=True,
+    )

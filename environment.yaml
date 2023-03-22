@@ -5,6 +5,7 @@ channels:
   - cf-staging
 dependencies:
   - aicsimageio=4.9.4
+  - cellpose
   - numpy=1.21.2
   - pip
   - python=3.9.10

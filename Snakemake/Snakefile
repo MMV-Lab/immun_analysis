@@ -5,9 +5,14 @@ PATH = "/home/user/immun_analysis"
 INPUT = join(PATH, "input")
 OUTPUT = join(PATH, "result")
 CONFIG = "config.yaml"
+TYPE = (".tif", ".tiff")
+image = list(image for image in os.listdir(INPUT) if image.endswith(TYPE))
 
 STEP1 = "otsu_segmented"
+TOPHAT = "otsu_tophat"
+DAPI = "dapi_segmented"
 STEP2 = "otsu_registrated"
+DAPIDILATE = "dapi_dilated"
 STEP3 = "ml_segmented"
 STEP4 = "ml_registrated"
 
@@ -15,28 +20,9 @@ STEP4 = "ml_registrated"
 configfile: join(PATH, CONFIG)
 
 
-TARGET = "_" + config["target"]
-REGISTRATION = "_" + config["registration"]
-types = set(file.split(".")[-1] for file in os.listdir(INPUT))
-if "tif" in types and "tiff" in types:
-    print("Both .tif and .tiff files detected. Please use only one format")
-    TYPE = ""
-elif "tif" in types:
-    TYPE = ".tif"
-else:
-    TYPE = ".tiff"
-
-image = list(
-    set(
-        "_".join(image.split("_")[:-1])
-        for image in os.listdir(INPUT)
-        if image.endswith(TYPE)
-    )
-)
-
-
 ############   rules   ############
 include: "rules/otsu.smk"
+include: "rules/dapi.smk"
 include: "rules/registration.smk"
 include: "rules/ml.smk"
 include: "rules/skeletonization.smk"
@@ -45,8 +31,8 @@ include: "rules/statistic.smk"
 
 ############   inputs   ############
 def get_input(image, input_list=[]):
-    input_list.append(expand(join(OUTPUT, STEP1, "{image}" + TYPE), image=image))
-    input_list.append(expand(join(OUTPUT, STEP2, "{image}" + TYPE), image=image))
+    input_list.append(expand(join(OUTPUT, STEP1, "{image}"), image=image))
+    input_list.append(expand(join(OUTPUT, STEP2, "{image}"), image=image))
     return input_list
 
 

@@ -1,7 +1,8 @@
 rule otsu:
     input:
-        join(INPUT, "{image}" + TARGET + TYPE),
+        join(INPUT, "{image}"),
     output:
-        join(OUTPUT, STEP1, "{image}" + TYPE),
+        join(OUTPUT, TOPHAT, "{image}"),
+        join(OUTPUT, STEP1, "{image}"),
     shell:
-        "python Snakemake/scripts/otsu_segmentation.py {input} {output} -c {CONFIG}"
+        "python Snakemake/scripts/otsu_segmentation.py --input {input} --output {output} -c {CONFIG}"
