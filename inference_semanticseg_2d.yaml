@@ -2,6 +2,7 @@ mode: inference
 data:
   inference_input:
     dir:
+    data_type: 'tif'
     reader_params:
       dimension_order_out: "YX"
       T: 0
