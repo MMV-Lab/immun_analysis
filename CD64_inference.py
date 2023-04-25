@@ -5,23 +5,23 @@ from aicsimageio import AICSImage
 from aicsimageio.writers import OmeTiffWriter
 from mmv_im2im.configs.config_base import ProgramConfig, parse_adaptor, configuration_validation
 from mmv_im2im import ProjectTester
-from skimage import morphology
+from skimage.morphology import remove_small_objects
 
 # Configs
 tophat_IM_input_dir =  Path('/mnt/eternus/share/immun_project/segmentation/step1_tophat/')
 inference_input_savedir = Path('/mnt/eternus/share/immun_project/training_data/inference_input/')
-Seg_input_dir =  inference_input_savedir 
-Seg_savedir = Path('/mnt/eternus/share/immun_project/segmentation/step5_CD64/')
+seg_input_dir =  inference_input_savedir 
+seg_savedir = Path('/mnt/eternus/share/immun_project/segmentation/step5_CD64/')
 
 config_path = "/mnt/eternus/share/immun_project/training_data/inference_semanticseg_2d.yaml"
 checkpoint_path= "/mnt/eternus/share/immun_project/training_data/v3/best.ckpt"
 
 size_filter_threshold = 45
 cutoff_value = 0.1
-use_gpu = False
+use_gpu = True
 
 if not inference_input_savedir.exists(): inference_input_savedir.makedirs()
-if not Seg_savedir.exists(): Seg_savedir.makedirs()
+if not seg_savedir.exists(): seg_savedir.makedirs()
 
 # read the file path and collect original input images
 def copy_image(input_dir,savedir):
@@ -39,8 +39,8 @@ copy_image(tophat_IM_input_dir,inference_input_savedir)
 # load the inference configuration
 cfg = parse_adaptor(config_class=ProgramConfig, config = config_path)
 cfg = configuration_validation(cfg)
-cfg.data.inference_input.dir = Seg_input_dir
-cfg.data.inference_output.path = Seg_savedir
+cfg.data.inference_input.dir = seg_input_dir
+cfg.data.inference_output.path = seg_savedir
 cfg.model.checkpoint = checkpoint_path
 
 # Use CPU or GPU
@@ -57,13 +57,12 @@ executor.setup_model()
 executor.setup_data_processing()
 
 # get the data, run inference, run size filter, and save the result
-filenames = sorted(Seg_input_dir.glob("*.tiff"))
+filenames = sorted(seg_input_dir.glob("*.tiff"))
 for fn in filenames:
-    print(fn)
     img = AICSImage(fn).get_image_data("YX", Z=0, C=0, T=0)
     pred = executor.process_one_image(img)
     seg = pred > cutoff_value
-    size_filter_seg = morphology.remove_small_objects(seg>0,size_filter_threshold).astype(np.uint8)
+    size_filter_seg = remove_small_objects(seg>0,size_filter_threshold).astype(np.uint8)
     size_filter_seg[size_filter_seg > 0] = 1
-    out_path = Seg_savedir / fn.name
+    out_path = seg_savedir / fn.name
     OmeTiffWriter.save(size_filter_seg, out_path, dim_orders="YX")
