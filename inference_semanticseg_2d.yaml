@@ -2,15 +2,11 @@ mode: inference
 
 data:
   inference_input:
-    dir: '/mnt/eternus/share/immun_project/training_data/inference_input/'
-
     reader_params:
       dimension_order_out: "YX"
       T: 0
       C: 0
       Z: 0
-  inference_output:
-    path: '/mnt/eternus/share/immun_project/training_data/v3/inference/'
 
   preprocess:
 
@@ -28,7 +24,7 @@ data:
       func_name: extract_segmentation
       params:
         channel: 1
-        cutoff: 0.1
+        # cutoff: 0.1
         batch_dim: True
 
 
