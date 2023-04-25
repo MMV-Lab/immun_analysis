@@ -1,4 +1,3 @@
-import os
 import numpy as np
 
 from pathlib import Path
@@ -8,17 +7,20 @@ from mmv_im2im.configs.config_base import ProgramConfig, parse_adaptor, configur
 from mmv_im2im import ProjectTester
 from skimage import morphology
 
+# Configs
 tophat_IM_input_dir =  Path('/mnt/eternus/share/immun_project/segmentation/step1_tophat/')
 inference_input_savedir = Path('/mnt/eternus/share/immun_project/training_data/inference_input/')
-if not os.path.exists(inference_input_savedir): os.makedirs(inference_input_savedir)
 
 size_filter_threshold = 45
+cutofff_value = 0.1
 
 input_dir =  inference_input_savedir 
 savedir = Path('/mnt/eternus/share/immun_project/segmentation/step5_CD64/')
-if not os.path.exists(savedir): os.makedirs(savedir)
 
 config_path = "/mnt/eternus/share/immun_project/training_data/inference_semanticseg_2d.yaml"
+
+if not inference_input_savedir.exists(): inference_input_savedir.makedirs()
+if not savedir.exists(): savedir.makedirs()
 
 # read the file path and collect original input images
 def copy_image(input_dir,savedir):
@@ -31,21 +33,6 @@ def copy_image(input_dir,savedir):
         OmeTiffWriter.save(image , out_path, dim_order="YX") 
 
 copy_image(tophat_IM_input_dir,inference_input_savedir)
-
-
-
-# Size_Filter main function
-def Size_Filter(IM):
-    IM = IM.astype(np.uint8) 
-    try:
-        size_filter_IM = morphology.remove_small_objects( IM>0,size_filter_threshold )
-    except Exception as e:
-        print(e)
-        import pdb; pdb.set_trace()
-
-    size_filter_IM = size_filter_IM.astype(np.float64)
-    # lb, num = morphology.label(size_filter_IM, return_num=True)
-    return size_filter_IM
 
 # load the inference configuration
 cfg = parse_adaptor(config_class=ProgramConfig, config = config_path)
@@ -61,8 +48,10 @@ filenames = sorted(input_dir.glob("*.tiff"))
 for fn in filenames:
     print(fn)
     img = AICSImage(fn).get_image_data("YX", Z=0, C=0, T=0)
-    seg = executor.process_one_image(img)
-    size_filter_seg = Size_Filter(seg)
+    pred = executor.process_one_image(img)
+    seg = pred > cutofff_value
+    size_filter_seg = morphology.remove_small_objects(seg>0,size_filter_threshold).astype(np.float64)
+    size_filter_seg[size_filter_seg > 0] = 1
     out_path = savedir / fn.name
     OmeTiffWriter.save(size_filter_seg, out_path, dim_orders="YX")
 
