@@ -46,7 +46,7 @@ docker run -v "C:\Users\Devon\VSProjects\immun_analysis:/home/user/immun_analysi
 use_gpu = False
 
 ## `Dependents`
-  pip install aicsimageio scikit-image mmv_im2im os numpy pathlib
+  pip install aicsimageio scikit-image mmv_im2im numpy pathlib
 
 ## `Usage`
   python CD64_inference.py
