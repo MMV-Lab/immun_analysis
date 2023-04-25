@@ -34,9 +34,11 @@ def copy_image(input_dir,savedir):
 
 copy_image(tophat_IM_input_dir,inference_input_savedir)
 
+
 # load the inference configuration
 cfg = parse_adaptor(config_class=ProgramConfig, config = config_path)
 cfg = configuration_validation(cfg)
+import pdb;pdb.set_trace()
 
 # define the executor for inference
 executor = ProjectTester(cfg)
@@ -54,9 +56,3 @@ for fn in filenames:
     size_filter_seg[size_filter_seg > 0] = 1
     out_path = savedir / fn.name
     OmeTiffWriter.save(size_filter_seg, out_path, dim_orders="YX")
-
-
-
-
-
-
