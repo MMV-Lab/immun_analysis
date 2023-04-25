@@ -49,7 +49,7 @@ executor.setup_model()
 executor.setup_data_processing()
 
 # get the data, run inference, run size filter, and save the result
-filenames = sorted(IM_input_dir.glob("*."+cfg.data.inference_input.data_type))
+filenames = sorted(IM_input_dir.glob("*.tif"))
 for fn in filenames:
     img = AICSImage(fn).get_image_data("YX", Z=0, C=0, T=0)
     pred = executor.process_one_image(img)
