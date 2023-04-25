@@ -2,14 +2,16 @@ mode: inference
 
 data:
   inference_input:
+    dir:
     reader_params:
       dimension_order_out: "YX"
       T: 0
       C: 0
       Z: 0
+  inference_output: 
+    path:
 
   preprocess:
-
       - module_name: monai.transforms
         func_name: NormalizeIntensity        
 
@@ -38,8 +40,9 @@ model:
       in_channels: 1
       out_channels: 2
 
-  checkpoint: "/mnt/eternus/share/immun_project/training_data/v3/best.ckpt"
+  checkpoint: 
   model_extra:
+    cpu_only: False
     sliding_window_params:
       roi_size: [256, 256] 
       sw_batch_size: 4
@@ -50,4 +53,4 @@ trainer:
   params:
     gpus: 1
     precision: 32
-    
+    accelerator: "gpu"
