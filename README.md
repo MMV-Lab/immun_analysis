@@ -32,12 +32,18 @@ docker run -v "C:\Users\Devon\VSProjects\immun_analysis:/home/user/immun_analysi
   tophat_IM_input_dir =  Path('/mnt/eternus/share/immun_project/segmentation/step1_tophat/')
 ### the output folder path as inference input folder path 
   inference_input_savedir = Path('/mnt/eternus/share/immun_project/training_data/inference_input/')
-### the threshold for size filter 
-  size_filter_threshold = 45
 ### the output CD64 segment tiff folder path    
-  savedir = Path('/mnt/eternus/share/immun_project/segmentation/step5_CD64/') 
+  Seg_savedir = Path('/mnt/eternus/share/immun_project/segmentation/step5_CD64/') 
 ### the config path
   config_path = "/mnt/eternus/share/immun_project/training_data/inference_semanticseg_2d.yaml"
+### the checkpoint path
+  checkpoint_path= "/mnt/eternus/share/immun_project/training_data/v3/best.ckpt"
+### the threshold for size filter 
+  size_filter_threshold = 45
+### the cutoff value for segmentation
+  cutoff_value = 0.1
+### only use CPU or use GPU 
+use_gpu = False
 
 ## `Dependents`
   pip install aicsimageio scikit-image mmv_im2im os numpy pathlib
