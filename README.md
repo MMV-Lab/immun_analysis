@@ -42,7 +42,7 @@ docker run -v "C:\Users\Devon\VSProjects\immun_analysis:/home/user/immun_analysi
 ### the cutoff value for segmentation
   cutoff_value = 0.1
 ### only use CPU or use GPU 
-use_gpu = False
+use_gpu = True
 
 ## `Dependents`
   pip install aicsimageio scikit-image mmv_im2im numpy os pathlib
