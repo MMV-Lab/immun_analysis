@@ -21,3 +21,31 @@ Follow these instructions to perform the analysis without docker:
 6. Type `snakemake -c all --snakefile ./Snakemake/Snakefile`.
 
 docker run -v "C:\Users\Devon\VSProjects\immun_analysis:/home/user/immun_analysis/" immunanalysis
+
+***
+
+# CD64_Seg
+  Use this code to get segmentation from CD64 image after tophat. 
+
+## `Configs`
+
+### the input tophat tiff image folder path  
+  IM_input_dir =  Path('/mnt/eternus/share/immun_project/segmentation/step1_tophat/')
+### the output CD64 segment tiff folder path    
+  seg_save_dir = Path('/mnt/eternus/share/immun_project/segmentation/step5_CD64/') 
+### the config path
+  config_path = "/mnt/eternus/share/immun_project/training_data/inference_semanticseg_2d.yaml"
+### the checkpoint path
+  checkpoint_path= "/mnt/eternus/share/immun_project/training_data/v3/best.ckpt"
+### the threshold for size filter 
+  size_filter_threshold = 45
+### the cutoff value for segmentation
+  cutoff_value = 0.1
+### only use CPU or use GPU 
+use_gpu = True
+
+## `Dependents`
+  pip install aicsimageio scikit-image mmv_im2im numpy os pathlib
+
+## `Usage`
+  python CD64_inference.py
