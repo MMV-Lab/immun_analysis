@@ -1,6 +1,6 @@
 # immun_analysis
 ***
-Immun_analysis is an open-soure ...
+Immun_analysis is an open-source ...
 ## `Docker Version`
 
 Follow these instructions to perform the analysis:
@@ -43,9 +43,6 @@ docker run -v "C:\Users\Devon\VSProjects\immun_analysis:/home/user/immun_analysi
   cutoff_value = 0.1
 ### only use CPU or use GPU 
 use_gpu = True
-
-## `Dependents`
-  pip install aicsimageio scikit-image mmv_im2im numpy os pathlib
 
 ## `Usage`
   python CD64_inference.py

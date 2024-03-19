@@ -3,3 +3,4 @@ result/**
 Snakemake/model/**
 Dockerfile
 README.md
+backup/**
