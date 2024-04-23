@@ -13,7 +13,22 @@ from utils import (
 import get_networkx_graph_from_array
 
 
-def count_endpoints_in_component(graph, start_node):
+def count_endpoints_branchpoints_branches_in_component(graph, start_node):
+    """Starts at a random endpoint start_node and calculates endpoints, branchpoints and branches
+    for the graph representation of the skeletonized object in graph.
+
+    Parameters
+    ----------
+    graph : nx.Graph
+        connected component representation of a skeletonized object
+    start_node : _type_
+        random endpoint to start from
+
+    Returns
+    -------
+    int
+        number of endpoints, branchpoints and branches
+    """
     endpoints = 0
     branchpoints = 0
     branches = 1
@@ -63,7 +78,11 @@ if __name__ == "__main__":
             if len(component_list) == 1:
                 endpoints, branchpoints, branches = 0, 0, 0
             else:
-                endpoints, branchpoints, branches = count_endpoints_in_component(
+                (
+                    endpoints,
+                    branchpoints,
+                    branches,
+                ) = count_endpoints_branchpoints_branches_in_component(
                     img_graph, start_node
                 )
 
@@ -123,10 +142,3 @@ if __name__ == "__main__":
     df_sum.rename({"endpoints_count": "cell_count"}, axis=1).to_excel(
         snakemake.output[1]
     )
-    # df_sum = (
-    #     df_sum.groupby("sample", as_index=False)
-    #     .agg(["count", "sum", "mean", "std", "sem", "median", "max"])
-    #     .rename({"count": "cell_count"}, axis=1)
-    # )
-    # df_sum.columns = [a[1] for a in df_sum.columns.to_flat_index()]
-    # df_sum.to_excel(snakemake.output[1])

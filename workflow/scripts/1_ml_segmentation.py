@@ -28,6 +28,23 @@ DEFAULTMODEL = "default"
 
 
 def load_model_path(model_name):
+    """imports the machine learning model
+
+    Parameters
+    ----------
+    model_name : str
+        name of the model
+
+    Returns
+    -------
+    str
+        path to the model
+
+    Raises
+    ------
+    NotImplementedError
+        checkpoint file of the model was not found
+    """
     if model_name != "default":
         model_path = join(MODELPATH, model_name)
         test_model = join(
@@ -39,7 +56,7 @@ def load_model_path(model_name):
         print(model_path)
         if not isfile(test_model):
             raise NotImplementedError(
-                "Pass in either 'default' or the name of a pretrained model"
+                "The checkpoint file was not found.\nPass in either 'default' or the name of a pretrained model and add the checkpoint"
             )
     else:
         model_path = join(MODELPATH, DEFAULTMODEL)
@@ -47,6 +64,18 @@ def load_model_path(model_name):
 
 
 def load_interference_config(model_path):
+    """loads and configures the interference config for the ml model.
+
+    Parameters
+    ----------
+    model_path : str
+        path to the model
+
+    Returns
+    -------
+    dict
+        ml interference config
+    """
     cfg = parse_adaptor(
         config_class=ProgramConfig,
         config=join(

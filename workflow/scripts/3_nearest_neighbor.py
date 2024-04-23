@@ -100,13 +100,6 @@ if __name__ == "__main__":
             ]
         )
 
-        # reconstruct if images have differing physical pixel sizes
-        # distance_limits = [
-        #     convert_physical_to_pixel_size(
-        #         limit, reader.physical_pixel_sizes, dim="X", rounded=False
-        #     )
-        #     for limit in distance_limits_stored
-        # ]
         neighbors = np.vstack(
             [get_neighbors(distances, limit).sum(axis=1) for limit in distance_limits]
         )

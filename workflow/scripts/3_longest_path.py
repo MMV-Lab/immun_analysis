@@ -12,6 +12,18 @@ from utils import (
 
 
 def longest_path_from_subplot(subgraph):
+    """Determines the longest path of the graph representation of the skeletonized object in subgraph.
+
+    Parameters
+    ----------
+    subgraph : nx.Graph
+        connected component representation of a skeletonized object
+
+    Returns
+    -------
+    float
+        longest path
+    """
     diameter_nodes = []
     longest_path = 0
     for nodes_combinations in it.combinations(nx.periphery(subgraph), 2):

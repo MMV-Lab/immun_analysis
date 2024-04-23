@@ -133,7 +133,7 @@ def convert_df_to_sets(df):
         list: A list of sets of tuples, where each set corresponds to a group in the DataFrame and each tuple combines feature values.
     """
     return (
-        df.groupby("label")["x", "y"]
+        df.groupby("label")[["x", "y"]]
         .apply(lambda x: set(zip(x["y"], x["x"])))
         .to_list()
     )

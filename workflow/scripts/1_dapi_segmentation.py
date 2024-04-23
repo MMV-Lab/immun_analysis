@@ -22,8 +22,6 @@ CHAN = 0
 CHAN2 = 0
 ############   Main   ############
 if __name__ == "__main__":
-    config = snakemake.config
-
     if snakemake.config["dapi_segmentation"]["model_name"] != "default":
         model_path = join(
             MODELPATH, snakemake.config["dapi_segmentation"]["model_name"]
