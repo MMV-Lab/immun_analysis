@@ -3,18 +3,18 @@ mode: inference
 data:
   inference_input:
     dir: "/mnt/eternus/users/Shuo/project/Andreia_task/dataset/adtiff_processed/CX3CR1_ALL"
-    data_type: 'tiff'
+    data_type: "tiff"
     reader_params:
       dimension_order_out: "YX"
       T: 0
       C: 0
       Z: 0
-  inference_output: 
+  inference_output:
     path: "/mnt/eternus/users/Shuo/project/Andreia_task/dataset/adtiff_processed/CX3CR1_SEG"
 
   preprocess:
-      - module_name: monai.transforms
-        func_name: NormalizeIntensity        
+    - module_name: monai.transforms
+      func_name: NormalizeIntensity
 
   postprocess:
     - module_name: torch.nn
@@ -39,17 +39,17 @@ model:
       in_channels: 1
       out_channels: 2
 
-  checkpoint: 
+  checkpoint:
   model_extra:
     cpu_only: False
     sliding_window_params:
-      roi_size: [256, 256] 
+      roi_size: [256, 256]
       sw_batch_size: 4
       overlap: 0.2
       mode: "gaussian"
 
-# trainer:
-#   params:
-#     gpus: 1
-#     precision: 32
-#     accelerator: "gpu"
+trainer:
+  params:
+    gpus: 1
+    precision: 32
+    accelerator: "gpu"

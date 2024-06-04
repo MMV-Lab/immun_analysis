@@ -1,11 +1,12 @@
 target:
   #- Marker
-  - CD64
+  #- CD64
   - TMEM119
 registration: DAPI
 
 ### Segmentation ###
 otsu_segmentation:
+  active: True
   contrast:
     percentile:
       - 0.1
@@ -26,6 +27,7 @@ dapi_segmentation:
   gpu: True
 
 ml_segmentation:
+  active: True
   TMEM119:
     model_name: TMEM119_file
     config: ZS_TMEM119_inference_semanticseg_2d_HighResNet_20231221.yaml
@@ -43,7 +45,7 @@ ml_segmentation:
     cutoff_value: 0.1
   large_objects:
     active: True # Default False
-    max_size: 150 # μm²
+    max_size: 600 # μm²
     connectivity: 2
   small_holes:
     active: True # Default True

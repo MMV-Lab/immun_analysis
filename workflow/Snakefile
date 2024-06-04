@@ -6,7 +6,7 @@ import os
 PATH = os.getcwd()
 INPUT = join(PATH, "input")
 OUTPUT = join(PATH, "result")
-CONFIG = "config.yaml"
+CONFIG = "config/config.yml"
 
 
 configfile: join(PATH, CONFIG)

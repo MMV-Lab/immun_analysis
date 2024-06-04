@@ -9,12 +9,14 @@ from utils import (
     get_image_data,
     get_reader,
     save_image,
-    get_coords,
 )
-from porespy.filters import fftmorphology
-from skimage.morphology import disk, label
+
+from skimage.morphology import disk, binary_dilation
 import numpy as np
-import pandas as pd
+
+import logging
+
+logging.getLogger("porespy").setLevel(logging.WARNING)
 
 MODELPATH = "workflow/model/dapi"
 DEFAULTMODEL = "cellpose_residual_on_style_on_concatenation_off_DAPI_CELLPOSE_TRAIN_2023_01_10_11_34_21.773728"
@@ -69,7 +71,7 @@ if __name__ == "__main__":
     disk_dilation = disk(distance_filter_threshold)
 
     img[img > 0] = 1
-    mask_dilated = fftmorphology(img, disk_dilation, mode="dilation")
+    mask_dilated = binary_dilation(img, disk_dilation)
 
     if np.count_nonzero(mask_dilated) == 0:
         raise ValueError(

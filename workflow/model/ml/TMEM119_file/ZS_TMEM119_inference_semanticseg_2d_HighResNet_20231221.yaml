@@ -4,18 +4,18 @@ data:
   inference_input:
     # dir: "/mnt/eternus/users/Shuo/project/Robin_task/TMEM119_TASK/TMEM119_top_hat"
     dir: "/mnt/eternus/share/immun_project/segmentation/step8_TMEM119_tophat"
-    data_type: 'tif'
+    data_type: "tif"
     reader_params:
       dimension_order_out: "YX"
       T: 0
       C: 0
       Z: 0
-  inference_output: 
+  inference_output:
     path: "/mnt/eternus/share/immun_project/segmentation/Compare7_TMEM119_ML_Seg"
 
   preprocess:
-      - module_name: monai.transforms
-        func_name: NormalizeIntensity        
+    - module_name: monai.transforms
+      func_name: NormalizeIntensity
 
   postprocess:
     - module_name: torch.nn
@@ -44,13 +44,13 @@ model:
   model_extra:
     cpu_only: False
     sliding_window_params:
-      roi_size: [256, 256] 
+      roi_size: [256, 256]
       sw_batch_size: 4
       overlap: 0.2
       mode: "gaussian"
 
-# trainer:
-#   params:
-#     gpus: 1
-#     precision: 32
-#     accelerator: "gpu"
+trainer:
+  params:
+    gpus: 1
+    precision: 32
+    accelerator: "gpu"

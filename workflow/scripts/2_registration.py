@@ -2,11 +2,12 @@ import warnings
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
 warnings.simplefilter(action="ignore", category=RuntimeWarning)
+
 from utils import convert_physical_to_pixel_size, get_reader, get_image_data, save_image
 import numpy as np
 import pandas as pd
-from skimage.morphology import label, disk
-from porespy.filters import fftmorphology
+from skimage.morphology import label, disk, binary_dilation
+
 from scipy.sparse import csr_matrix
 
 
@@ -106,7 +107,7 @@ def get_individual_dilated_dapi(dapi_coords, disk_dilation):
         )
         mask[y_shifted, x_shifted] = True
         # Dilate mask and extract dilated coordinates
-        dilated_mask = fftmorphology(mask, disk_dilation, mode="dilation")
+        dilated_mask = binary_dilation(mask, disk_dilation)
         dilated_coords = np.argwhere(dilated_mask)
         # Shift coordinates back
         dilated_coords[:, 0] += y_min - distance_filter_threshold
@@ -256,9 +257,7 @@ if __name__ == "__main__":
     except ZeroDivisionError:
         distance_filter_threshold = 1
     disk_dilation = disk(distance_filter_threshold)
-    marker_dilated = fftmorphology(
-        registered_img.copy(), disk_dilation, mode="dilation"
-    )
+    marker_dilated = binary_dilation(registered_img.copy(), disk_dilation)
     registered_dapi = remove_irrelevant_obj(dapi_img, marker_dilated)
     labeled_dapi, num = label(registered_dapi > 0, return_num=True)
     dapi_coords = get_coords(labeled_dapi, False)

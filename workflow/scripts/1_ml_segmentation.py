@@ -16,6 +16,7 @@ from utils import (
     remove_so,
     save_image,
 )
+import torch.cuda as cuda
 
 from skimage.morphology import label
 
@@ -91,12 +92,24 @@ def load_interference_config(model_path):
     cfg = configuration_validation(cfg)
 
     # Use CPU or GPU
-    cfg.trainer.params = (
-        {"accelerator": "gpu", "device": 1}
-        if snakemake.config["ml_segmentation"]["gpu"]
-        else {"accelerator": "cpu"}
-    )
-    cfg.model.model_extra["cpu_only"] = not snakemake.config["ml_segmentation"]["gpu"]
+
+    if cuda.is_available():
+        precision = cfg.trainer.params["precision"]
+        gpus = cfg.trainer.params["gpus"]
+        accelerator = (
+            {"accelerator": "gpu", "device": 1, "precision": precision, "gpus": gpus}
+            if snakemake.config["ml_segmentation"]["gpu"]
+            else {"accelerator": "cpu", "precision": precision}
+        )
+        cpu_only = not snakemake.config["ml_segmentation"]["gpu"]
+    else:
+        precision = cfg.trainer.params["precision"]
+        accelerator = {"accelerator": "cpu", "precision": precision}
+        cpu_only = True
+
+    cfg.trainer.params = accelerator
+    cfg.model.model_extra["cpu_only"] = cpu_only
+    print(cfg)
     return cfg
 
 
