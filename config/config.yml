@@ -1,12 +1,10 @@
 target:
-  #- Marker
-  #- CD64
   - TMEM119
 registration: DAPI
 
 ### Segmentation ###
 otsu_segmentation:
-  active: True
+  active: False
   contrast:
     percentile:
       - 0.1
@@ -31,16 +29,6 @@ ml_segmentation:
   TMEM119:
     model_name: TMEM119_file
     config: ZS_TMEM119_inference_semanticseg_2d_HighResNet_20231221.yaml
-    checkpoint: best.ckpt
-    cutoff_value: 0.1
-  CD64:
-    model_name: default
-    config: inference_semanticseg_2d.yaml
-    checkpoint: best.ckpt
-    cutoff_value: 0.1
-  Marker:
-    model_name: andreia
-    config: Andreia_inference_semanticseg_2d.yaml
     checkpoint: best.ckpt
     cutoff_value: 0.1
   large_objects:

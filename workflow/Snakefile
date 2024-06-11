@@ -13,7 +13,11 @@ configfile: join(PATH, CONFIG)
 
 
 TYPE = (".tif", ".tiff")
-MARKERS = ["ml"]  # "otsu",
+MARKERS = []
+if config["ml_segmentation"]["active"]:
+    MARKERS.append("ml")
+if config["otsu_segmentation"]["active"]:
+    MARKERS.append("otsu")
 TARGETS = config["target"]
 TOPHAT = "tophat"
 DAPI = "dapi_segmented"
