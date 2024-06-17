@@ -1,0 +1,59 @@
+target:
+  - TMEM119
+registration: DAPI
+
+### Segmentation ###
+otsu_segmentation:
+  active: False
+  contrast:
+    percentile:
+      - 0.1
+      - 99.9
+  tophat:
+    element_size:
+      - 16.25
+      - 16.25
+  otsu_threshold:
+    factor: 2.1
+  small_objects:
+    min_size: 3.2 # μm²
+    connectivity: 2
+
+dapi_segmentation:
+  model_name: default # default or model name
+  model_diameter: 0 # default or float for the custom model; if 0, it tries to retrieve it from the model
+  gpu: True
+
+ml_segmentation:
+  active: True
+  TMEM119:
+    model_name: TMEM119_file
+    config: ZS_TMEM119_inference_semanticseg_2d_HighResNet_20231221.yaml
+    checkpoint: best.ckpt
+    cutoff_value: 0.1
+  large_objects:
+    active: True # Default False
+    max_size: 600 # μm²
+    connectivity: 2
+  small_holes:
+    active: True # Default True
+    area_threshold: 2.25 # μm²
+    connectivity: 1
+  small_objects:
+    active: True # Default True
+    min_size: 4 # μm²
+    connectivity: 2 # 1
+  gpu: True
+
+### Registration ###
+colocalization:
+  distance_filter_threshold: 2.25 # μm
+
+### Analyis ###
+nearest_neighbor:
+  distances:
+    - 5
+    - 10
+    - 20
+    - 30
+    - 40

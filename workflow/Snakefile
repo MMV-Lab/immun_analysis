@@ -1,0 +1,100 @@
+############   config   ############
+from os.path import join
+import os
+
+# os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
+PATH = os.getcwd()
+INPUT = join(PATH, "input")
+OUTPUT = join(PATH, "result")
+CONFIG = "config/config.yml"
+
+
+configfile: join(PATH, CONFIG)
+
+
+TYPE = (".tif", ".tiff")
+MARKERS = []
+if config["ml_segmentation"]["active"]:
+    MARKERS.append("ml")
+if config["otsu_segmentation"]["active"]:
+    MARKERS.append("otsu")
+TARGETS = config["target"]
+TOPHAT = "tophat"
+DAPI = "dapi_segmented"
+OTSUSEG = "otsu_segmented"
+DAPIDILATE = "dapi_dilated"
+DAPISPARSE = "dapi_sparse"
+MLSEG = "ml_segmented"
+image = [image for image in os.listdir(INPUT) if image.endswith(TYPE)]
+
+
+# rules
+include: "rules/0_tophat.smk"
+include: "rules/1_otsu_segmentation.smk"
+include: "rules/1_ml_segmentation.smk"
+include: "rules/1_dapi_segmentation.smk"
+include: "rules/2_registration.smk"
+include: "rules/2_skeletonization.smk"
+include: "rules/3_cell_area.smk"
+include: "rules/3_branch_counter.smk"
+include: "rules/3_longest_path.smk"
+include: "rules/3_nearest_neighbor.smk"
+
+
+# inputs
+def get_input(image, input_list=[]):
+    input_list.append(
+        expand(
+            join(
+                OUTPUT,
+                "{TARGETS}" + "_" + "{MARKERS}" + "_branch_counter",
+                "branches_stats.xlsx",
+            ),
+            TARGETS=TARGETS,
+            MARKERS=MARKERS,
+            image=image,
+        )
+    )
+    input_list.append(
+        expand(
+            join(
+                OUTPUT,
+                "{TARGETS}" + "_" + "{MARKERS}" + "_longest_path",
+                "longest_path_stats.xlsx",
+            ),
+            TARGETS=TARGETS,
+            MARKERS=MARKERS,
+            image=image,
+        )
+    )
+    input_list.append(
+        expand(
+            join(
+                OUTPUT,
+                "{TARGETS}" + "_" + "{MARKERS}" + "_neighborhood",
+                "neighborhood_stats.xlsx",
+            ),
+            TARGETS=TARGETS,
+            MARKERS=MARKERS,
+            image=image,
+        )
+    )
+    input_list.append(
+        expand(
+            join(
+                OUTPUT,
+                "{TARGETS}" + "_" + "{MARKERS}" + "_cell_area",
+                "cell_area_stats.xlsx",
+            ),
+            TARGETS=TARGETS,
+            MARKERS=MARKERS,
+            image=image,
+        )
+    )
+    return input_list
+
+
+############   target rule   ############
+rule summary:
+    input:
+        get_input(image),
