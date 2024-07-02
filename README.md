@@ -45,7 +45,6 @@ Immune Cell Segmentation & Shape Analysis is an open-source Snakemake workflow t
 </p>
 
 ## Correspondence
-[**Prof. Dr. Daniel R. Engel**](mailto:danielrobert.engel@uk-essen.de): Department of Immunodynamics, Institute of Experimental Immunology and Imaging, University Hospital Essen, Essen, Germany
-
-http://www.immunodynamics.de
+[**Prof. Dr. Daniel R. Engel**](mailto:danielrobert.engel@uk-essen.de): Department of Immunodynamics, Institute of Experimental Immunology and Imaging, University Hospital Essen, Essen, Germany http://www.immunodynamics.de
+[**Dr. Jianxu Chen**](mailto:jianxu.chen@isas.de): Leibniz-Institut für Analytische Wissenschaften-ISAS-e.V., Dortmund, Germany.
 
