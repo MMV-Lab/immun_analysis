@@ -5,7 +5,3 @@ rule ml:
         join(OUTPUT, "{TARGETS}" + "_" + MLSEG, "{image}"),
     script:
         "../scripts/1_ml_segmentation.py"
-
-
-# shell:
-#    "python Snakemake/scripts/ml_segmentation.py {input} {output} '{CONFIG}'"

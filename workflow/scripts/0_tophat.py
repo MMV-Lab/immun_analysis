@@ -42,10 +42,10 @@ if __name__ == "__main__":
     img = get_image_data(reader, snakemake.wildcards.TARGETS)
 
     img_contrast = contrast_stretching(
-        img, snakemake.config["otsu_segmentation"]["contrast"]["percentile"]
+        img, snakemake.config["top_hat"]["contrast"]["percentile"]
     )
 
-    ellipse_size = snakemake.config["otsu_segmentation"]["tophat"]["element_size"]
+    ellipse_size = snakemake.config["top_hat"]["tophat"]["element_size"]
 
     ellipse_size[0] = convert_physical_to_pixel_size(
         ellipse_size[0], reader.physical_pixel_sizes, dim="Y"

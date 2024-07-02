@@ -1,49 +1,64 @@
+### image Channels ###
 target:
-  - TMEM119
-registration: DAPI
+  # Target cell marker channels, fill in all channel names to use for analysis
+  - CD64
+registration: DAPI # Channel name of the DAPI marker
 
-### Segmentation ###
-otsu_segmentation:
-  active: False
+### Top Hat ###
+top_hat:
   contrast:
     percentile:
+      # min and max values to use for contrast stretching
       - 0.1
       - 99.9
   tophat:
     element_size:
+      # x and y sizes of the ellipse for the white top hat filter.
       - 16.25
       - 16.25
-  otsu_threshold:
-    factor: 2.1
-  small_objects:
-    min_size: 3.2 # μm²
-    connectivity: 2
 
+### Segmentation ###
 dapi_segmentation:
-  model_name: default # default or model name
-  model_diameter: 0 # default or float for the custom model; if 0, it tries to retrieve it from the model
+  # default or model name for custom cellpose model
+  model_name: default
+  # default or float for the custom model; if 0, it tries to retrieve it from the model
+  model_diameter: 0
   gpu: True
 
 ml_segmentation:
   active: True
-  TMEM119:
-    model_name: TMEM119_file
-    config: ZS_TMEM119_inference_semanticseg_2d_HighResNet_20231221.yaml
-    checkpoint: best.ckpt
+  # Example input definition for target cell marker x19
+  #x19:
+  #  model_name: x19_model <- folder name of the ml model
+  #  cutoff_value: 0.1
+  CD64:
+    model_name: default
     cutoff_value: 0.1
   large_objects:
+    # Removes larger objects than max_size after segmentation
     active: True # Default False
     max_size: 600 # μm²
     connectivity: 2
   small_holes:
+    # Closes smaller holes than area_threshold after segmentation
     active: True # Default True
     area_threshold: 2.25 # μm²
     connectivity: 1
   small_objects:
+    # Removes smaller objects than min_size after segmentation
     active: True # Default True
     min_size: 4 # μm²
-    connectivity: 2 # 1
+    connectivity: 2 # 2
   gpu: True
+
+otsu_segmentation:
+  active: False
+  otsu_threshold:
+    factor: 2.1
+  small_objects:
+    # Removes smaller objects than min_size after segmentation
+    min_size: 3.2 # μm²
+    connectivity: 2
 
 ### Registration ###
 colocalization:
@@ -57,3 +72,10 @@ nearest_neighbor:
     - 20
     - 30
     - 40
+# connectivity guide:
+#1-connectivity     2-connectivity     diagonal connection close-up
+#     [ ]           [ ]  [ ]  [ ]             [ ]
+#      |               \  |  /                 |  <- hop 2
+#[ ]--[x]--[ ]      [ ]--[x]--[ ]        [x]--[ ]
+#      |               /  |  \             hop 1
+#     [ ]           [ ]  [ ]  [ ]

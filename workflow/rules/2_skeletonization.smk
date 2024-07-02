@@ -5,7 +5,3 @@ rule skeletonization:
         join(OUTPUT, "{TARGETS}" + "_" + "{MARKERS}" + "_sekeletonization", "{image}"),
     script:
         "../scripts/2_skeletonization.py"
-
-
-# shell:
-#     "python Snakemake/scripts/skeletonization.py --input {input} --output {output} -c {CONFIG}"
