@@ -1,6 +1,7 @@
 import warnings
 import numpy as np
-from os.path import join, isfile
+from os.path import join
+from os import listdir
 from mmv_im2im.configs.config_base import (
     ProgramConfig,
     parse_adaptor,
@@ -48,17 +49,11 @@ def load_model_path(model_name):
     """
     if model_name != "default":
         model_path = join(MODELPATH, model_name)
-        test_model = join(
-            model_path,
-            snakemake.config["ml_segmentation"][snakemake.wildcards.TARGETS][
-                "checkpoint"
-            ],
-        )
-        print(model_path)
-        if not isfile(test_model):
-            raise NotImplementedError(
-                "The checkpoint file was not found.\nPass in either 'default' or the name of a pretrained model and add the checkpoint"
-            )
+        for file in listdir(model_path):
+            if not file.endswith(".ckpt"):
+                raise NotImplementedError(
+                    "The checkpoint file was not found.\nPass in either 'default' or the name of a pretrained model and add the checkpoint"
+                )
     else:
         model_path = join(MODELPATH, DEFAULTMODEL)
     return model_path
@@ -77,18 +72,22 @@ def load_interference_config(model_path):
     dict
         ml interference config
     """
+    for file in listdir(model_path):
+        if file.endswith(".yaml"):
+            yaml_file_path = join(model_path, file)
+        else:
+            raise NotImplementedError(
+                "The model config file was not found.\nPass in either 'default' or the name of a pretrained model and add the config"
+            )
     cfg = parse_adaptor(
         config_class=ProgramConfig,
-        config=join(
-            model_path,
-            snakemake.config["ml_segmentation"][snakemake.wildcards.TARGETS]["config"],
-        ),
+        config=yaml_file_path,
     )
 
-    cfg.model.checkpoint = join(
-        model_path,
-        snakemake.config["ml_segmentation"][snakemake.wildcards.TARGETS]["checkpoint"],
-    )
+    for file in listdir(model_path):
+        if file.endswith(".ckpt"):
+            ckpt_file_path = join(model_path, file)
+    cfg.model.checkpoint = ckpt_file_path
     cfg = configuration_validation(cfg)
 
     # Use CPU or GPU

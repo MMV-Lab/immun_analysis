@@ -2,7 +2,6 @@
 from os.path import join
 import os
 
-# os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 PATH = os.getcwd()
 INPUT = join(PATH, "input")
 OUTPUT = join(PATH, "result")

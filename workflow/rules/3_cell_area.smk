@@ -1,6 +1,3 @@
-# cell area
-# average branch length
-
 rule cell_area:
     input:
         expand(

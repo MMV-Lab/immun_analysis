@@ -14,9 +14,6 @@ from utils import (
 from skimage.morphology import disk, binary_dilation
 import numpy as np
 
-import logging
-
-logging.getLogger("porespy").setLevel(logging.WARNING)
 
 MODELPATH = "workflow/model/dapi"
 DEFAULTMODEL = "cellpose_residual_on_style_on_concatenation_off_DAPI_CELLPOSE_TRAIN_2023_01_10_11_34_21.773728"

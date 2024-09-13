@@ -1,5 +1,4 @@
 import itertools
-# import time
 
 import numpy as np
 import networkx as nx
@@ -11,23 +10,11 @@ this dictionary can be used for graph creation
 since networkx graph based on looking up the array and the
 adjacent coordinates takes long time. create a dict
 using dict_of_indices_and_adjacent_coordinates.
-(-1 -1 -1) (-1 0 -1) (-1 1 -1)
-(-1 -1 0)  (-1 0 0)  (-1 1 0)
-(-1 -1 1)  (-1 0 1)  (-1 1 1)
-(0 -1 -1) (0 0 -1) (0 1 -1)
-(0 -1 0)  (0 0 0)  (0 1 0)
-(0 -1 1)  (0 0 1)  (0 1 1)
-(1 -1 -1) (1 0 -1) (1 1 -1)
-(1 -1 0)  (1 0 0)  (1 1 0)
-(1 -1 1)  (1 0 1)  (1 1 1)
 """
 
-# permutations of (-1, 0, 1) in three/two dimensional tuple format
-# representing 8 and 26 increments around a pixel at origin (0, 0, 0)
+# permutations of (-1, 0, 1) in two dimensional tuple format
+# representing 8 increments around a pixel at origin (0, 0)
 # 2nd ordered neighborhood around a voxel/pixel
-LIST_STEP_DIRECTIONS3D = list(itertools.product((-1, 0, 1), repeat=3))
-LIST_STEP_DIRECTIONS3D.remove((0, 0, 0))
-
 LIST_STEP_DIRECTIONS2D = list(itertools.product((-1, 0, 1), repeat=2))
 LIST_STEP_DIRECTIONS2D.remove((0, 0))
 
@@ -41,7 +28,7 @@ def _get_increments(config_number, dimensions):
     config_number : int64
         integer less than 2 ** 26
     dimensions: int
-        number of dimensions, can only be 2 or 3
+        number of dimensions, can only be 2
     Returns
     -------
     list
@@ -49,16 +36,12 @@ def _get_increments(config_number, dimensions):
     Notes
     ------
     As in the beginning of the program, there are incremental directions
-    around a voxel at origin (0, 0, 0) which are returned by this function.
+    around a voxel at origin (0, 0) which are returned by this function.
     config_number is a decimal number representation of 26 binary numbers
     around a voxel at the origin in a second ordered neighborhood
     """
     config_number = np.int64(config_number)
-    if dimensions == 3:
-        # convert decimal number to a binary string
-        list_step_directions = LIST_STEP_DIRECTIONS3D
-    elif dimensions == 2:
-        list_step_directions = LIST_STEP_DIRECTIONS2D
+    list_step_directions = LIST_STEP_DIRECTIONS2D
     neighbor_values = [
         (config_number >> digit) & 0x01 for digit in range(3**dimensions - 1)
     ]
@@ -75,7 +58,7 @@ def _set_adjacency_list(arr):
     Parameters
     ----------
     arr : numpy array
-        binary numpy array can only be 2D Or 3D
+        binary numpy array can only be 2D
     Returns
     -------
     dict_of_indices_and_adjacent_coordinates: Dictionary
@@ -84,26 +67,11 @@ def _set_adjacency_list(arr):
         in it's second order neighborhood
     """
     dimensions = arr.ndim
-    assert dimensions in [2, 3], "array dimensions must be 2 or 3, they are {}".format(
+    assert dimensions in [2], "array dimensions must be 2, they are {}".format(
         dimensions
     )
-    if dimensions == 3:
-        # flipped 3D template in advance
-        template = np.array(
-            [
-                [
-                    [33554432, 16777216, 8388608],
-                    [4194304, 2097152, 1048576],
-                    [524288, 262144, 131072],
-                ],
-                [[65536, 32768, 16384], [8192, 0, 4096], [2048, 1024, 512]],
-                [[256, 128, 64], [32, 16, 8], [4, 2, 1]],
-            ],
-            dtype=np.uint64,
-        )
-    else:
-        # 2 dimensions
-        template = np.array([[128, 64, 32], [16, 0, 8], [4, 2, 1]], dtype=np.uint64)
+    # 2 dimensions
+    template = np.array([[128, 64, 32], [16, 0, 8], [4, 2, 1]], dtype=np.uint64)
     # convert the binary array to a configuration number array of same size
     # by convolving with template
     arr = np.ascontiguousarray(arr, dtype=np.uint64)
@@ -145,7 +113,6 @@ def _remove_clique_edges(networkx_graph):
     lengths that form the 3 vertex clique.
     Doesn't deal with any other cliques
     """
-    # start = time.time()
     cliques = nx.find_cliques_recursive(networkx_graph)
     # all the nodes/vertices of 3 cliques
     three_vertex_cliques = [clq for clq in cliques if len(clq) == 3]
@@ -183,7 +150,6 @@ def _remove_clique_edges(networkx_graph):
                         clique_edges.append(combination_edges[main_dim][sub_dim])
                         break
         networkx_graph.remove_edges_from(clique_edges)
-        # print("time taken to remove cliques is %0.2f seconds" % (time.time() - start))
     return networkx_graph
 
 
